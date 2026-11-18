@@ -19,4 +19,4 @@ git diff upstream/main main -- src/
 
 | ID | Status | Commit | Summary | Paths | Upstream Issue | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| P-001 | `pending` | `ed790270456222c3ed77ff2eeb09a9170f030909` | Bind `moveByWord` to `Ctrl-ArrowLeft`/`Ctrl-ArrowRight` (`Alt-ArrowLeft`/`Alt-ArrowRight` on macOS) so `Cmd-ArrowLeft`/`Cmd-ArrowRight` runs `moveToLineSide` | `src/editor/keymap.ts`, `test/webtest-commands.ts` | https://code.haverbeke.berlin/wordgard/wordgard/issues/163 | |
+| P-001 | `pending` | `ed790270456222c3ed77ff2eeb09a9170f030909` | Bind `moveByWord` to `Ctrl-ArrowLeft`/`Ctrl-ArrowRight` (`Alt-ArrowLeft`/`Alt-ArrowRight` on macOS) so `Cmd-ArrowLeft`/`Cmd-ArrowRight` runs `moveToLineSide` | `src/editor/keymap.ts`, `test/webtest-commands.ts` | https://code.haverbeke.berlin/wordgard/wordgard/issues/163 | Test updated in `70780cd389176009e628e80bff3784df3d1cb83b` |
