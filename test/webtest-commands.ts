@@ -1,4 +1,4 @@
-import {Wordgard} from "wordgard/editor"
+import {Wordgard, KeyBinding} from "wordgard/editor"
 import {Command, deleteLine, killToLineEnd, yankKilled} from "wordgard/command"
 import {GardState} from "wordgard/state"
 import {Plot} from "wordgard/doc"
@@ -87,5 +87,59 @@ describe("killToLineEnd", () => {
     Command.dispatch(wg, killToLineEnd)
     Command.dispatch(wg, yankKilled)
     ist(wg.state.doc, doc(p("a"), p("c")), eq)
+  })
+})
+
+function normalizeForPlatform(name: string, platform: "mac" | "linux") {
+  let parts = name.split(/-(?!$)/), key = parts[parts.length - 1]
+  let alt = false, ctrl = false, shift = false, meta = false
+  for (let i = 0; i < parts.length - 1; i++) {
+    let mod = parts[i]
+    if (mod == "Cmd" || mod == "Meta") meta = true
+    else if (mod == "Alt") alt = true
+    else if (mod == "Ctrl") ctrl = true
+    else if (mod == "Shift") shift = true
+    else if (mod == "Mod") { if (platform == "mac") meta = true; else ctrl = true }
+  }
+  if (alt) key = "Alt-" + key
+  if (ctrl) key = "Ctrl-" + key
+  if (meta) key = (platform == "mac" ? "Cmd-" : "Meta-") + key
+  if (shift) key = "Shift-" + key
+  return key
+}
+
+function runDefaultKey(wg: Wordgard, platform: "mac" | "linux", keyName: string) {
+  let target = normalizeForPlatform(keyName, platform)
+  for (let b of KeyBinding.defaultKeymap) {
+    let raw = b.spec[platform] || b.spec.key
+    if (!raw) continue
+    if (normalizeForPlatform(raw, platform) == target && Command.dispatch(wg, b.spec.run))
+      return true
+    if (b.spec.shift && normalizeForPlatform("Shift-" + raw, platform) == target && Command.dispatch(wg, b.spec.shift))
+      return true
+  }
+  return false
+}
+
+describe("defaultKeymap horizontal motion", () => {
+  it("moves to line boundaries on macOS Cmd-Arrow and by word on Alt-Arrow", () => {
+    let wg = tempEditor(doc(p("one two three", 0)))
+    ist(runDefaultKey(wg, "mac", "Cmd-ArrowLeft"), true)
+    ist(wg.state.selection.head, 1)
+    ist(runDefaultKey(wg, "mac", "Cmd-ArrowRight"), true)
+    ist(wg.state.selection.head, 14)
+    ist(runDefaultKey(wg, "mac", "Alt-ArrowLeft"), true)
+    ist(wg.state.selection.head, 9)
+    ist(runDefaultKey(wg, "mac", "Shift-Cmd-ArrowLeft"), true)
+    ist(wg.state.selection.anchor, 9)
+    ist(wg.state.selection.head, 1)
+  })
+
+  it("moves by word on non-macOS Ctrl-Arrow", () => {
+    let wg = tempEditor(doc(p("one two three", 0)))
+    ist(runDefaultKey(wg, "linux", "Ctrl-ArrowLeft"), true)
+    ist(wg.state.selection.head, 9)
+    ist(runDefaultKey(wg, "linux", "Ctrl-ArrowRight"), true)
+    ist(wg.state.selection.head, 14)
   })
 })
