@@ -37,6 +37,8 @@ npm run test-headless -- --binary "/Applications/Google Chrome.app/Contents/MacO
 
 ## 3. Adding a Patch (Two-Commit Rule)
 
+Before reporting or patching a suspected upstream issue, first check the latest `upstream/main` commits and all open and closed issues on `code.haverbeke.berlin/wordgard/wordgard/issues` to confirm that neither Marijn nor another contributor has already fixed or reported it. Present the findings to the maintainer and wait for their decision on whether to file an upstream issue, wait, or apply a local patch.
+
 Assign sequential IDs (`P-001`, `P-002`, ...) in `PATCHES.md` for source or build changes. Record every patch as two consecutive commits:
 
 1. **Commit 1 (code and tests only)**:
