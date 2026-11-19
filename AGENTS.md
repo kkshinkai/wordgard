@@ -79,19 +79,30 @@ To drop a patch that upstream has not absorbed:
 ## 6. Tagging and Downstream Consumption
 
 - Never modify the `version` field in `package.json`; keep it identical to upstream to prevent merge conflicts when upstream cuts new releases.
-- To cut an immutable tag for downstream projects from a tested `main` commit, read the current upstream `version` from `package.json` (for example `0.7.0`), find the highest existing `kk-v<version>-<n>` tag suffix on `origin`, create an annotated tag `kk-v<version>-<next>` (resetting `<next>` to `1` when `<version>` advances):
+- Remote `refs/heads/main` and `refs/tags/kk-v*` are protected by active GitHub Rulesets (`deletion` and `non_fast_forward` on `main`; `deletion`, `update`, and `non_fast_forward` on `kk-v*`, with no bypass actors). Never delete or move an existing `kk-v*` tag.
+- To cut an immutable tag for downstream projects from a CI-tested `main` commit, read the current upstream `version` from `package.json` (for example `0.7.0`), find the highest existing `kk-v<version>-<n>` tag suffix on `origin`, create an annotated tag `kk-v<version>-<next>` (resetting `<next>` to `1` when `<version>` advances):
 
 ```sh
 git tag -a kk-v0.7.0-1 -m "kk-v0.7.0-1"
 git push origin refs/tags/kk-v0.7.0-1
 ```
 
-- Reference the tag (or `#main` during active development) in downstream `package.json` files; the package manager runs `prepare` automatically on install to build `dist/`:
+- Reference the immutable tag in downstream `package.json` files:
 
 ```json
 {
   "dependencies": {
     "wordgard": "git+https://github.com/kkshinkai/wordgard.git#kk-v0.7.0-1"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "wordgard"
+    ]
   }
 }
 ```
+
+- Downstream requirements:
+  1. **Allow `prepare` in `pnpm` v10+**: `pnpm` v10+ skips dependency lifecycle scripts by default. Every `pnpm` consumer must list `"wordgard"` in `onlyBuiltDependencies` (and `allowBuilds.wordgard: true` if `allowBuilds` is configured in `pnpm-workspace.yaml`) so `pnpm install` runs `prepare` (`node bin/build.ts`) to generate `dist/`.
+  2. **Node.js `>= 22.18` (or `>= 24`)**: `prepare` invokes `node bin/build.ts` directly using Node's built-in TypeScript stripping.
+  3. **Local cross-repo iteration**: Run `npm run watch` in this repository and add a temporary uncommitted `"overrides": { "wordgard": "link:<local-path>" }` entry in the downstream workspace. Never commit relative `file:` or `link:` paths.
