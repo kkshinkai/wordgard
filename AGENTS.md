@@ -79,12 +79,12 @@ To drop a patch that upstream has not absorbed:
 ## 6. Tagging and Downstream Consumption
 
 - Never modify the `version` field in `package.json`; keep it identical to upstream to prevent merge conflicts when upstream cuts new releases.
-- Remote `refs/heads/main` and `refs/tags/kk-v*` are protected by active GitHub Rulesets (`deletion` and `non_fast_forward` on `main`; `deletion`, `update`, and `non_fast_forward` on `kk-v*`, with no bypass actors). Never delete or move an existing `kk-v*` tag.
-- To cut an immutable tag for downstream projects from a CI-tested `main` commit, read the current upstream `version` from `package.json` (for example `0.7.0`), find the highest existing `kk-v<version>-<n>` tag suffix on `origin`, create an annotated tag `kk-v<version>-<next>` (resetting `<next>` to `1` when `<version>` advances):
+- Remote `refs/heads/main` and `refs/tags/shinkai-v*` are protected by active GitHub Rulesets (`deletion` and `non_fast_forward` on `main`; `deletion`, `update`, and `non_fast_forward` on `shinkai-v*`, with no bypass actors). Never delete or move an existing `shinkai-v*` tag.
+- To cut an immutable tag for downstream projects from a CI-tested `main` commit, read the current upstream `version` from `package.json` (for example `0.7.0`), find the highest existing `shinkai-v<version>-<n>` tag suffix on `origin`, create an annotated tag `shinkai-v<version>-<next>` (resetting `<next>` to `1` when `<version>` advances):
 
 ```sh
-git tag -a kk-v0.7.0-1 -m "kk-v0.7.0-1"
-git push origin refs/tags/kk-v0.7.0-1
+git tag -a shinkai-v0.7.0-1 -m "shinkai-v0.7.0-1"
+git push origin refs/tags/shinkai-v0.7.0-1
 ```
 
 - Reference the immutable tag in downstream `package.json` files:
@@ -92,7 +92,7 @@ git push origin refs/tags/kk-v0.7.0-1
 ```json
 {
   "dependencies": {
-    "wordgard": "git+https://github.com/kkshinkai/wordgard.git#kk-v0.7.0-1"
+    "wordgard": "git+https://github.com/kkshinkai/wordgard.git#shinkai-v0.7.0-1"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
